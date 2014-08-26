@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
 
     plt.figure(1)
-    plt.plot(dat[0,:],dat[1,:],'b.')
+    for i in range(0,500):
+        plt.plot(dat[0,i],dat[1,i],'b.')
     plt.title('Simplest default with labels')
     plt.show()

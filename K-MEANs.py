@@ -31,8 +31,30 @@ import pylab as p
 import math
 from scipy import stats, mgrid, c_, reshape, random, rot90, linalg
 
+
+def KMEANs_procedure(num,dat,initial_codebook):
+    """
+    :param num: repeatation ammount
+    :param dat: input vector set
+    :param initial_codebook: initial central of clusters
+    :return: NON
+    """
+    [Dim,num_of_codebook] = np.shape(initial_codebook)
+    AvgDist = zeros(num)
+    code_book = initial_codebook
+
+    for i in range(0,num):
+        AvgDist[i],code_book  = KMEANS_general(dat,code_book)#082614 debug
+        print i,'th code book\n'
+        for j in range(0,num_of_codebook):
+            print j,code_book[:,j]
+
+    return AvgDist
+
+
 def distance(x1,x2):
     """
+    calculating distance between two point(x1,x2)
     :param x1: input vector 1
     :param x2: input vetor 2
     :return: distance which between x1 and x2
@@ -44,20 +66,93 @@ def distance(x1,x2):
     y = math.sqrt(y)
     return y
 
-def KMEANS(dat,num,code_book):
+def KMEANS_general(dat,code_book):
     """
+    :param dat: input vector set
+    :param code_book:input codebook -cluster list
+    :param num: clustering ammount
+    :return: AvgDist, temp_codebook
+    """
+    [dim,num_dat] = np.shape(dat)
+    [dim_code,num_code] = np.size(code_book)
+    temp_dat = zeros((dim+1,num_dat),type=float) #expand data
+    temp_dat[0,:] = dat[0,:] # x axis value
+    temp_dat[1,:] = dat[1,:] # y axis value
+    #temp_dat[2,:] = clustering value
+    temp_codebook = zeros(size(code_book))
+    ret_codebook = zeros(size(code_book))
+    AvgDist = 0.0
+    inf = 10000.0
+    count = 0.0
+
+    #clustering phase
+    for i in range(0,num_dat):
+        for j in range(0,num_code):
+            min_key = inf
+            if distance(dat[0:1,i],code_book[:,j])<min_key:
+                min_key = distance(dat[0:1,i],code_book[:,j])
+                temp_dat[2,j] = j
+
+    #code_book renewal
+    for j in range(0,num_code):
+        for i in range(0,num_dat):
+            if dat[2,i]==j:
+                temp_codebook[0:1,j] = temp_codebook[0:1,j] + dat[0:1,i]
+                count = count+1
+        temp_codebook[0:1,j] = temp_codebook[0:1,j]/count
+
+
+    #computing total disortion
+    AvgDist = Average_Disortion(dat,code_book)
+    Graph_clust(temp_dat)
+    return AvgDist,temp_codebook
+    #calculating total disortion
+
+
+
+
+def KMEANS_LBG(dat,code_book):
+    """
+    binary-split k-means algorithm
     :param dat: input vector
-    :param num: number of code(cluster)
     :param code_book: initial code book
     :return: final code book
     """
-    [dim,num_dat] = np.size(dat)
-    iter = 0
-    while iter==num_dat:
-        iter = iter+1
+    [dim,num_dat] = np.shape(dat)
+    [dim_code,num_code] = np.size(code_book)
+    temp_dat = zeros((dim+1,num_dat),type=float)
+    temp_codebook = zeros(size(code_book))
+    temp_codebook = code_book
+    ret_codebook = zeros(size(code_book))
+    AvgDist = []; #total average distortion
+    inf = 10000.0
+    for i in range(0,num_dat):
+        min_key = inf;
+        for j in range(0,num_code):
+            if distance(dat[0:1,i],code_book[:,j]) < min_key:
+                min_key = distance(dat[0:1,i],code_book[:,j])
+                dat[2,i]  = j
+
+    color = 'rgbkcmy'
+
+
+def Graph_clust(dat,num_of_cluster):
+    plt.figure(1)
+    color = 'rgbcmky'
+    [Dim,num] = np.size(dat)
+    for j in range(0,num_of_codebook):
+        for i in range(0,num):
+            if dat[2:i]==j:
+                plt.plot(dat[0,i],dat[1,i],color[j])
+    plt.title('Simplest default with labels')
+    plt.show()
+
+
+
 
 def Average_Disortion(dat,codebook):
     """
+    computing total disortion of dat
     :param dat: set of input vectorW
     :param codebook: set of central of cluster
     :return: average value of disortion of all data
@@ -74,13 +169,7 @@ def Average_Disortion(dat,codebook):
             if temp_key < min_key:
                 min_key = temp_key
         total_disortion = total_disortion + temp_key
-
     return total_disortion/num_dat
-
-
-
-
-
 
 def genData(Ndat):
         c1 = 0.5
@@ -111,14 +200,26 @@ def genData(Ndat):
         return(vstack((X4[0:Ndat],Y4[0:Ndat])))
 
 
-
-
-
-
-
 if __name__ == "__main__":
     random.seed(12345)
     dat = genData(500)
-    temp_dist = distance(dat[:,0],dat[:,1])
-    print temp_dist
+    num_of_codebook = 4
+    clustering_count = 10;
+    x_axis = linspace(0,clustering_count);
+    AvgDist = zeros(10)
+    code_book = genData(num_of_codebook)
+
+    #temp_dist = distance(dat[:,0],dat[:,1])
+    #print temp_dist
+
     print 'k-means algorithm'
+    print 'initial code book'
+    for i in range(0,num_of_codebook):
+        print i,code_book[:,i]
+    AvgDist = KMEANs_procedure(clustering_count,dat,code_book)
+
+    plt.figure(2)
+    plt.plot(x_axis, AvgDist)
+    plt.title('Total Average Disortion')
+    plt.show()
+
