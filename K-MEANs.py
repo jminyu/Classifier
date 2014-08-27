@@ -31,6 +31,7 @@ import pylab as p
 import math
 from scipy import stats, mgrid, c_, reshape, random, rot90, linalg
 
+from DataGen import genData
 
 def KMEANs_procedure(num,dat,initial_codebook):
     """
@@ -71,7 +72,7 @@ def KMEANS_general(dat,code_book):
     :param dat: input vector set
     :param code_book:input codebook -cluster list
     :param num: clustering ammount
-    :return: AvgDist, temp_codebook
+    :return: AvgDist(Average ot total Disortion), temp_codebook(temporal codebook)
     """
     [dim,num_dat] = np.shape(dat)
     [dim_code,num_code] = np.shape(code_book)
@@ -91,7 +92,7 @@ def KMEANS_general(dat,code_book):
             temp_distance = distance(temp_dat[0:1,i],code_book[:,j])
             if temp_distance<min_key:
                 min_key = temp_distance
-                temp_dat[2,i] = j
+                temp_dat[2,i] = j #assignment cluster number
 
     #code_book renewal
     for j in range(0,num_code):
@@ -108,9 +109,6 @@ def KMEANS_general(dat,code_book):
     Graph_clust(temp_dat,num_of_codebook)
     return AvgDist,temp_codebook
     #calculating total disortion
-
-
-
 
 def KMEANS_LBG(dat,code_book):
     """
@@ -138,6 +136,11 @@ def KMEANS_LBG(dat,code_book):
 
 
 def Graph_clust(dat,num_of_cluster):
+    """
+    :param dat: input data(vector)
+    :param num_of_cluster: number of code(size of codebook)
+    :return:Non
+    """
     plt.figure(1)
     color = ["r.","g.","b.","c.","m.","k.","y."]
     [Dim,num] = np.shape(dat)
@@ -171,34 +174,6 @@ def Average_Disortion(dat,codebook):
                 min_key = temp_key
         total_disortion = total_disortion + temp_key
     return total_disortion/num_dat
-
-def genData(Ndat):
-        c1 = 0.5
-        r1 = 0.4
-        r2 = 0.3
-        # generate enough data to filter
-        N = 20*Ndat
-        X = array(random_sample(N))
-        Y = array(random_sample(N))
-        X1 = X[(X-c1)*(X-c1) + (Y-c1)*(Y-c1) < r1*r1]
-        Y1 = Y[(X-c1)*(X-c1) + (Y-c1)*(Y-c1) < r1*r1]
-        X2 = X1[(X1-c1)*(X1-c1) + (Y1-c1)*(Y1-c1) > r2*r2]
-        Y2 = Y1[(X1-c1)*(X1-c1) + (Y1-c1)*(Y1-c1) > r2*r2]
-        X3 = X2[ abs(X2-Y2)>0.05 ]
-        Y3 = Y2[ abs(X2-Y2)>0.05 ]
-        #X3 = X2[ X2-Y2>0.15 ]
-        #Y3 = Y2[ X2-Y2>0.15]
-        X4=zeros(Ndat, dtype=float32)
-        Y4=zeros(Ndat, dtype=float32)
-        for i in xrange(Ndat):
-            if (X3[i]-Y3[i]) >0.05:
-                X4[i] = X3[i] + 0.08
-                Y4[i] = Y3[i] + 0.18
-            else:
-                X4[i] = X3[i] - 0.08
-                Y4[i] = Y3[i] - 0.18
-        print "X", size(X3[0:Ndat]), "Y", size(Y3)
-        return(vstack((X4[0:Ndat],Y4[0:Ndat])))
 
 
 if __name__ == "__main__":

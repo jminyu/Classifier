@@ -1,3 +1,4 @@
+__author__ = 'Schmidtz'
 import matplotlib
 import numpy as np
 import matplotlib.cm as cm
@@ -12,6 +13,7 @@ from numpy.random import *
 import pylab as p
 import math
 from scipy import stats, mgrid, c_, reshape, random, rot90, linalg
+
 
 def genData(Ndat):
         c1 = 0.5
@@ -40,49 +42,3 @@ def genData(Ndat):
                 Y4[i] = Y3[i] - 0.18
         print "X", size(X3[0:Ndat]), "Y", size(Y3)
         return(vstack((X4[0:Ndat],Y4[0:Ndat])))
-
-
-if __name__ == "__main__":
-    random.seed(12345)
-    dat = genData(500)
-    [Dim, num_of_data] = np.shape(dat)
-    noc = 6 #number of cluster
-    init_prob_noc = ones((1,k))/k
-    mu = np.randn((Dim,noc))
-    cov = np.zeros((Dim,Dim,noc))
-    gaus_val = np.zeros((Dim,noc))
-    iter = 10  #iteration account
-
-    #initialization of covariance matrix value
-    for i in range(0,noc):
-        cov[:,:] = -100*diag(log10(random(Dim,1)))
-
-    #EM algorithm
-    for i in range(1,iter):
-        print i,'th iteration steps'
-        #Estimation Stpe(E Step)
-        for j in range(i,noc):
-            #2-d gasussian distribution function
-            z[:,i] = init_prob_noc[i]*np.linalg.det(cov[:,:,j])
-
-        #Maximization Step(M Step)
-        for k in range(0,noc):
-            mu[:,k] =
-
-
-
-
-
-
-    '''
-    red = ["r.","b.","g.","c."]
-    plt.figure(1)
-    for i in range(0,100):
-        plt.plot(dat[0,i],dat[1,i],red[0])
-    for i in range(100,300):
-        plt.plot(dat[0,i],dat[1,i],red[1])
-    for i in range(300,500):
-        plt.plot(dat[0,i],dat[1,i],red[3])
-    plt.title('Simplest default with labels')
-    plt.show()
-    '''
