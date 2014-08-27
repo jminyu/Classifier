@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 
 import matplotlib as mpl
 import numpy as np
+from numpy import matrix
 from numpy import matlib
 from numpy import *
 from numpy.random import *
@@ -22,7 +23,7 @@ import pylab as p
 import math
 from scipy import stats, mgrid, c_, reshape, random, rot90, linalg
 
-from DataGen import genData
+from DataGen import genData, Mtx_multipl
 
 def initParams(Dim,num_of_code):
     """
@@ -44,11 +45,18 @@ def gauss_pdf(dat,means, covs):
     :param covs: covariance matrix about input vector (dim : R*R)
     :return: multivariate normal distribution value(pdf) (dim : 1*1)
     """
-    [dim,num_of_dat] = np.shape(dat)
+    [dim] = np.shape(dat)
     value_sub_means = dat - means
     det_covs = np.linalg.det(covs)
-    nd_value = np.exp(-0.5*np.linalg.transpose(value_sub_means)*np.linalg.inv(covs)*value_sub_means)/(pow(2*math.pi,dim/2)*np.sqrt(det_covs))  #normal distribution probabilty value
+    value_sub_means = np.reshape(value_sub_means,(1,2))
+    transpost_mtx = np.reshape(value_sub_means,(2,1))
+    invcov = np.linalg.inv(covs)
+    temp_valu1 = Mtx_multipl(value_sub_means,invcov)
+    temp_value = Mtx_multipl(temp_valu1,transpost_mtx)
+    nd_value = np.exp(-0.5*temp_value)/(pow(2*math.pi,dim/2)*np.sqrt(det_covs))  #normal distribution probabilty value
     return nd_value
+
+
 
 
 def loglikeGMM(dat,means, covs,mix_weight):
@@ -62,10 +70,15 @@ def loglikeGMM(dat,means, covs,mix_weight):
     """
     [dim, num_of_dat] = np.shape(dat)
     [dim_of_code,num_of_code] = np.shape(mix_weight)
-    new_mix = np.zeros((num_of_dat,num_of_code))
+    new_mix = np.zeros((num_of_code,num_of_dat))
+    diagcov = np.zeros((dim,dim))
     for n in range(0,num_of_dat):
         for m in range(0,num_of_code):
-            new_mix[m,n] =mix_weight[m]*gauss_pdf(dat[:,n],means[:,m],np.diag(covs))
+            temp_diagcov = np.diag(covs)
+            for k in range(0,np.size(temp_diagcov)):
+                diagcov[k,k] = temp_diagcov[k];
+            gausval = gauss_pdf(dat[:,n],means[:,m],diagcov)
+            new_mix[m,n] =mix_weight[:,m]*gausval
     total_loglike = log10(new_mix)
     return total_loglike,new_mix
 

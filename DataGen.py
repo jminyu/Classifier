@@ -15,6 +15,14 @@ import math
 from scipy import stats, mgrid, c_, reshape, random, rot90, linalg
 
 
+def Mtx_multipl(matrix1,matrix2):
+    product = np.zeros((len(matrix1),len(matrix2[0])))
+    for i in range(0,len(matrix1)):
+        for j in range(0,len(matrix2[0])):
+            for k in range(0,len(matrix2)):
+                product[i][j] += matrix1[i][k]*matrix2[k][j]
+    return product
+
 def genData(Ndat):
         c1 = 0.5
         r1 = 0.4
