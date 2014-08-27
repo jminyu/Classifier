@@ -46,9 +46,13 @@ if __name__ == "__main__":
     random.seed(12345)
     dat = genData(500)
 
-
+    red = ["r.","b.","g.","c."]
     plt.figure(1)
-    for i in range(0,500):
-        plt.plot(dat[0,i],dat[1,i],'b.')
+    for i in range(0,100):
+        plt.plot(dat[0,i],dat[1,i],red[0])
+    for i in range(100,300):
+        plt.plot(dat[0,i],dat[1,i],red[1])
+    for i in range(300,500):
+        plt.plot(dat[0,i],dat[1,i],red[3])
     plt.title('Simplest default with labels')
     plt.show()

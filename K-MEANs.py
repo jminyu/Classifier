@@ -74,37 +74,38 @@ def KMEANS_general(dat,code_book):
     :return: AvgDist, temp_codebook
     """
     [dim,num_dat] = np.shape(dat)
-    [dim_code,num_code] = np.size(code_book)
-    temp_dat = zeros((dim+1,num_dat),type=float) #expand data
+    [dim_code,num_code] = np.shape(code_book)
+    temp_dat = zeros((dim+1,num_dat)) #expand data
     temp_dat[0,:] = dat[0,:] # x axis value
     temp_dat[1,:] = dat[1,:] # y axis value
     #temp_dat[2,:] = clustering value
-    temp_codebook = zeros(size(code_book))
-    ret_codebook = zeros(size(code_book))
+    temp_codebook = zeros(np.shape(code_book))
     AvgDist = 0.0
     inf = 10000.0
     count = 0.0
 
     #clustering phase
     for i in range(0,num_dat):
+        min_key = inf
         for j in range(0,num_code):
-            min_key = inf
-            if distance(dat[0:1,i],code_book[:,j])<min_key:
-                min_key = distance(dat[0:1,i],code_book[:,j])
-                temp_dat[2,j] = j
+            temp_distance = distance(temp_dat[0:1,i],code_book[:,j])
+            if temp_distance<min_key:
+                min_key = temp_distance
+                temp_dat[2,i] = j
 
     #code_book renewal
     for j in range(0,num_code):
         for i in range(0,num_dat):
-            if dat[2,i]==j:
-                temp_codebook[0:1,j] = temp_codebook[0:1,j] + dat[0:1,i]
+            if temp_dat[2,i]== j:
+                temp_codebook[0,j] = temp_codebook[0,j] + temp_dat[0,i]
+                temp_codebook[1,j] = temp_codebook[1,j] + temp_dat[1,i]
                 count = count+1
         temp_codebook[0:1,j] = temp_codebook[0:1,j]/count
 
 
     #computing total disortion
     AvgDist = Average_Disortion(dat,code_book)
-    Graph_clust(temp_dat)
+    Graph_clust(temp_dat,num_of_codebook)
     return AvgDist,temp_codebook
     #calculating total disortion
 
@@ -138,11 +139,11 @@ def KMEANS_LBG(dat,code_book):
 
 def Graph_clust(dat,num_of_cluster):
     plt.figure(1)
-    color = 'rgbcmky'
-    [Dim,num] = np.size(dat)
+    color = ["r.","g.","b.","c.","m.","k.","y."]
+    [Dim,num] = np.shape(dat)
     for j in range(0,num_of_codebook):
         for i in range(0,num):
-            if dat[2:i]==j:
+            if dat[2,i]==j:
                 plt.plot(dat[0,i],dat[1,i],color[j])
     plt.title('Simplest default with labels')
     plt.show()
@@ -157,8 +158,8 @@ def Average_Disortion(dat,codebook):
     :param codebook: set of central of cluster
     :return: average value of disortion of all data
     """
-    [dim, num_dat] = size(dat)
-    [dim_code,num_code] = size(codebook)
+    [dim, num_dat] = np.shape(dat)
+    [dim_code,num_code] = np.shape(codebook)
     total_disortion = 0.0
     inf = 10000.0
 
@@ -205,7 +206,7 @@ if __name__ == "__main__":
     dat = genData(500)
     num_of_codebook = 4
     clustering_count = 10;
-    x_axis = linspace(0,clustering_count);
+    x_axis = linspace(0,9,clustering_count)
     AvgDist = zeros(10)
     code_book = genData(num_of_codebook)
 
