@@ -23,7 +23,7 @@ import pylab as p
 import math
 from scipy import stats, mgrid, c_, reshape, random, rot90, linalg
 
-from DataGen import genData, Mtx_multipl
+from DataGen import genData, Mtx_multipl,MTX_transpose
 
 def initParams(Dim,num_of_code):
     """
@@ -85,6 +85,7 @@ def loglikeGMM(dat,means, covs,mix_weight):
 
 def trainGMM(dat,means,covs,mix_weight,modeltype,threshold):
     [dim,num_of_data] = np.shape(dat);
+    xvarmat =  zeros((1,num_of_data))
     [dim_of_mix_weight,weight_length] = np.shape(mix_weight)
     max_iteration = 100
     #calculate initial likelihood:
@@ -108,7 +109,11 @@ def trainGMM(dat,means,covs,mix_weight,modeltype,threshold):
         for m in range(0,weight_length):
             #mean values update
             prob_sum = sum(renewal_mix_weight[m,:])
-            means[:,m] = (dat*transpose(renewal_mix_weight[m,:]))/prob_sum
+            mix_trans = MTX_transpose(renewal_mix_weight[m,:],'rowtocol')
+            dat = np.reshape(dat,(dim,num_of_data))
+            _temp_dat = Mtx_multipl(dat,mix_trans)
+            for d in range(0,dim):
+                means[d,m] = _temp_dat[d,0]/prob_sum
             #covariance values update
             if modeltype=='scalarcov':
                 for n in range(0,num_of_data):
@@ -117,10 +122,10 @@ def trainGMM(dat,means,covs,mix_weight,modeltype,threshold):
                 covs[:,m] = ones((dim,1))*(xvars*transpose(renewal_mix_weight[m,:]))/(dim*prob_sum)
             if modeltype == 'diagcov':
                 for n in range(0,num_of_data):
-                    meansub = dat[:,n]=means[:,m]
-                    xvarmat = multiply(meansub,meansub) #memory allocation in xcarmat
-                covs[:,m] = xvarmat*transpose(renewal_mix_weight[m,:])/prob_sum
-            mix_weight[m] = prob_sum/num_of_data #update mixture weight
+                    meansub = dat[:,n]-means[:,m]
+                    xvarmat[:,n] = dot(meansub,meansub) #memory allocation in xcarmat
+                covs[:,m] = dot(xvarmat,renewal_mix_weight[m,:])/prob_sum
+            mix_weight[:,m] = prob_sum/num_of_data #update mixture weight
 
         #plot new component centroid:
         plt.plot(means[0,:],means[1,:],'bo')
@@ -145,6 +150,7 @@ def trainGMM(dat,means,covs,mix_weight,modeltype,threshold):
 
 def classify_GMM(dat,means,covs,mix_weight):
     """
+    clsssificatlion using Gaussian mixture model
     :param dat: input vector (data which you want to classify)
     :param means: mean matrix (each cluster consis of several Gaussian distribution thus, each cluster have several means
     :param covs: covariance matrix list of each normal distribution
@@ -155,21 +161,53 @@ def classify_GMM(dat,means,covs,mix_weight):
     [dim_ofcluster,num_of_cluster] = np.shape(means)
 
 
+def plotGaussian(means,covs,colspec):
+    """
+    ploting graph for normal distribution
+    deviation ellipsis of the gaussian process that has mean value(means)
+    :param means: centroid of cluster
+    :param covs: covariance matrix
+    :param colspec:
+    :return:
+    """
+    npts = 100;
+    stdev = np.sqrt(covs)
 
+    t = np.linspace(-math.pim,math.pim,npts)
+    x = [cos(t), sin(t)]*stdev+rep
 
-
-
-
+def gaussian_2d(x, y, x0, y0, xsig, ysig): #testing
+    return np.exp(-0.5*(((x-x0) / xsig)**2 + ((y-y0) / ysig)**2))
 
 if __name__ == "__main__":
     random.seed(12345)
-    dat = genData(500)
-
+    num_of_dat = 500 #number ofinput dat
+    num_of_code = 4 #number of code
+    dat = genData(num_of_dat)
+    [dim,numdat] = np.shape(dat)
+    diagcov = np.zeros((dim,dim))
+    gaussian_value = zeros((num_of_code,num_of_dat))
     #parameter initialization
-    [means, covs, weight] = initParams(2,4);
+    [means, covs, weight] = initParams(dim,num_of_code);
 
     #Training GMM about data(dat)
     [means, covs, weight] = trainGMM(dat,means,covs,weight,'diagcov',0.00001)
+    for n in range(0,num_of_dat):
+        for m in range(0,num_of_code):
+            temp_diagcov = np.diag(covs)
+            for k in range(0,np.size(temp_diagcov)):
+                diagcov[k,k] = temp_diagcov[k];
+            gaussian_value[m,n] = gauss_pdf(dat[:,n],means[:,m],diagcov)
+
+    plt.plot(dat[0,:],dat[1,:],'r.')
+   # X,Y = np.meshgrid(dat[0,:],dat[1,:])
+   # Z1 = gaussian_2d(X, Y, means[0,0], means[1,0], covs[0,0],covs[0,0])
+   # Z2 = gaussian_2d(X, Y, means[0,1], means[1,1], 1., 1.)
+   # Z = Z1-Z2
+   # CS = plt.contour(X,Y,Z)
+   # plt.clabel(CS, inline=1, fontsize=10)
+    plt.title('Simplest default with labels')
+    plt.show()
     print 'trainining complete'
 
     #ploting

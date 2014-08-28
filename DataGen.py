@@ -23,6 +23,21 @@ def Mtx_multipl(matrix1,matrix2):
                 product[i][j] += matrix1[i][k]*matrix2[k][j]
     return product
 
+def MTX_transpose(matrix , mode):
+    mtx_length = np.size(matrix)
+    if mode=='rowtocol':
+        t_matrix = zeros((mtx_length,1))
+        for i in range(0,mtx_length):
+            t_matrix[i,:] = matrix[i]
+    if mode=='coltorow':
+        t_matrix = zeros((1,mtx_length))
+        for i in range(0,mtx_length):
+            t_matrix[:,i] = matrix[i]
+    return t_matrix
+
+
+
+
 def genData(Ndat):
         c1 = 0.5
         r1 = 0.4
