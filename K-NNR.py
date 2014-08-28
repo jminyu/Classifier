@@ -93,14 +93,14 @@ if __name__ == "__main__":
     label_dat3 = data_labeling(dat3,3)
 
     temp_dat = zeros((dim_of_dat+2,num_of_dat*3))
-    temp_dat[0:2,0:500] = label_dat1
-    temp_dat[0:2,500:1000] = label_dat2
-    temp_dat[0:2,1000:1500] = label_dat3
+    temp_dat[0:3,0:500] = label_dat1
+    temp_dat[0:3,500:1000] = label_dat2
+    temp_dat[0:3,1000:1500] = label_dat3
 
     test_point = np.mat('0.3;0.3')
-
+    temp_dist = 0.0;
     for i in range(0,num_of_dat*3):
-        temp_dist = distance(temp_dist[0:1,i],test_point)
+        temp_dist = distance(temp_dat[0:1,i],test_point)
         temp_dat[3,i] = temp_dist
 
     sorted_dat = sort_data(temp_dat);
@@ -112,3 +112,5 @@ if __name__ == "__main__":
     print '2st neighbor label : ',sorted_dat[2,1]
 
     print '3st neighbor label : ',sorted_dat[2,2]
+
+    print 'conclusion - test data is labeled to label1'
