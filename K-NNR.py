@@ -62,8 +62,8 @@ def sort_data(dat):#insertion sort
     for i in range(1, lenth_Dat):
         val = dat[3,i]
         j = i - 1
-        while (j >= 0) and (dat[3,j] > val):
-            dat[3,j+1] = dat[3,j]
+        while (j >= 0) and (dat[3,j] < val):
+            dat[:,j+1] = dat[:,j]
             j = j - 1
         dat[:,j+1] = dat[:,i]
 
@@ -76,28 +76,35 @@ if __name__ == "__main__":
     num_of_dat = 500
     dim_of_dat = 2
     K = 3
-
+    plt.figure(1)
     means1 = np.mat('1;1')
     covs1 = np.mat('0.3 0 ; 0 0.2')
     dat1 = genData_gaussian(num_of_dat,means1,covs1)
     label_dat1 = data_labeling(dat1,1)
+
+    plt.plot(dat1[0,:],dat1[1,:],'r.')
 
     means2 = np.mat('5;2')
     covs2 = np.mat('0.4 0 ; 0 0.4')
     dat2 = genData_gaussian(num_of_dat,means2,covs2)
     label_dat2 = data_labeling(dat2,2)
 
+    plt.plot(dat2[0,:],dat2[1,:],'b.')
+
     means3 = np.mat('1;5')
     covs3 = np.mat('0.3 0 ; 0 0.2')
     dat3 = genData_gaussian(num_of_dat,means3,covs3)
     label_dat3 = data_labeling(dat3,3)
+
+    plt.plot(dat3[0,:],dat3[1,:],'g.')
 
     temp_dat = zeros((dim_of_dat+2,num_of_dat*3))
     temp_dat[0:3,0:500] = label_dat1
     temp_dat[0:3,500:1000] = label_dat2
     temp_dat[0:3,1000:1500] = label_dat3
 
-    test_point = np.mat('0.3;0.3')
+    test_point = np.mat('3.3;2.7')
+    plt.plot(3.3,2.7,'co')
     temp_dist = 0.0;
     for i in range(0,num_of_dat*3):
         temp_dist = distance(temp_dat[0:1,i],test_point)
@@ -107,10 +114,11 @@ if __name__ == "__main__":
 
     print '3-NNR algorithm conclusion'
 
-    print '1st neighbor label : ',sorted_dat[2,0]
+    print '1st neighbor label : ',sorted_dat[2,0], 'distance from x: ',sorted_dat[3,0]
 
-    print '2st neighbor label : ',sorted_dat[2,1]
+    print '2st neighbor label : ',sorted_dat[2,1], 'distance from x: ',sorted_dat[3,1]
 
-    print '3st neighbor label : ',sorted_dat[2,2]
+    print '3st neighbor label : ',sorted_dat[2,2], 'distance from x: ',sorted_dat[3,2]
 
-    print 'conclusion - test data is labeled to label1'
+
+    plt.show()
