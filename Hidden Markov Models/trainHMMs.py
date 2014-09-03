@@ -18,7 +18,6 @@ from DataGen import genData,genData_gaussian,distance
 
 from sklearn import hmm
 
-
 def foroward_alg(initial,transition, observation,dat):
     """
     :param initial: start probabiltuy
