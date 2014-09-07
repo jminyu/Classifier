@@ -8,15 +8,10 @@ import cv2
 cap = cv2.VideoCapture('D:/Data/final data/dev20val20/devel-1-20_valid-1-20/devel01/K_1.avi')
 
 # params for ShiTomasi corner detection
-feature_params = dict( maxCorners = 100,
-                       qualityLevel = 0.3,
-                       minDistance = 7,
-                       blockSize = 7 )
+feature_params = dict( maxCorners = 100, qualityLevel = 0.3, minDistance = 7, blockSize = 16)
 
 # Parameters for lucas kanade optical flow
-lk_params = dict( winSize  = (40,40),
-                  maxLevel = 2,
-                  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+lk_params = dict( winSize  = (40,40), maxLevel = 40, criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 
 # Create some random colors
 color = np.random.randint(0,255,(100,3))
@@ -28,7 +23,7 @@ p0 = cv2.goodFeaturesToTrack(old_gray, mask = None, **feature_params)
 
 # Create a mask image for drawing purposes
 mask = np.zeros_like(old_frame)
-
+count = 0
 while(1):
     ret,frame = cap.read()
     if ret==True:
@@ -36,9 +31,13 @@ while(1):
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
-
+        print count
+        count = count+1
         # calculate optical flow
         p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
+        print np.shape(p1)
+        print st.shape
+        print err.shape
 
         # Select good points
         good_new = p1[st==1]

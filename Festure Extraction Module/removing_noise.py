@@ -24,12 +24,6 @@ def hog_extraction(frame):
     hog_dat,hog_image = hog(gray_frame,orientations=16,pixels_per_cell=(40,40),cells_per_block=(2,2),visualise=True)
     return hog_dat,hog_image
 
-
-
-
-
-
-
 def MorpologyClose(cap_stream,morp_stream,HOG_stream,csv_file_name):
     """
     Morphology processing(open operation) and Extracting HOG, saving data(HOG array) instance
@@ -38,7 +32,7 @@ def MorpologyClose(cap_stream,morp_stream,HOG_stream,csv_file_name):
     :return morp_stream : outliser removal video file
     """
     wfile = open(csv_file_name,"wb")
-    csv_writer = csv.writer(wfile,delimiter='\t',quoting=csv.QUOTE_ALL)
+    csv_writer = csv.writer(wfile,delimiter='\t',quoting=csv.QUOTE_NONE)
     kernel = np.ones((5,5),np.uint8) #kernal function for open operation
     while(cap_stream.isOpened()):
         ret, frame = cap_stream.read()

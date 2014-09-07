@@ -10,19 +10,23 @@ import sys
 import os
 import PIL
 import cv2.cv as cv
+import csv
+
+
+plt.figure(1)
+count = 0
+with open('D:/Data/final data/dev20val20/Result/hog.csv','rb') as f:
+    reader =  csv.reader(f,delimiter='\t')
+    for row in reader:
+        for element in row:
+            print float(element)
+            plt.plot(count,float(element),'b--')
+            count = count+1
+        plt.show()
+        count = 0
 
 
 
 
-
-
-
-cap_video = cv2.VideoCapture('D:/Data/final data/dev20val20/devel-1-20_valid-1-20/devel01/K_1.avi')
-
-fourcc = cv2.cv.CV_FOURCC('M','J','P','G')
-processed_video = cv2.VideoWriter('D:/Data/final data/dev20val20/Result/remove_outliers.avi',fourcc,10,(320,240))
-HOG_stream = cv2.VideoWriter('D:/Data/final data/dev20val20/Result/HOG_stream.avi',fourcc,10,(320,240))
-
-MorpologyClose(cap_video,processed_video,HOG_stream,'D:/Data/final data/dev20val20/Result/hog.csv')
 
 
