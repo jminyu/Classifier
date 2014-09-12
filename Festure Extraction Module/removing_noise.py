@@ -4,6 +4,7 @@ __author__ = 'Schmidtz'
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+import scipy as sp
 
 from skimage.feature import hog
 from skimage import data, color, exposure
@@ -13,6 +14,7 @@ import PIL
 import cv2.cv as cv
 
 import csv
+from etc_module import *
 
 def hog_extraction(frame):
     """
@@ -23,6 +25,10 @@ def hog_extraction(frame):
     gray_frame = color.rgb2gray(frame)
     hog_dat,hog_image = hog(gray_frame,orientations=16,pixels_per_cell=(40,40),cells_per_block=(2,2),visualise=True)
     return hog_dat,hog_image
+
+
+
+
 
 def MorpologyClose(cap_stream,morp_stream,HOG_stream,csv_file_name):
     """
@@ -40,8 +46,11 @@ def MorpologyClose(cap_stream,morp_stream,HOG_stream,csv_file_name):
             morp_frame = cv2.morphologyEx(frame,cv2.MORPH_CLOSE,kernel) #remove outlier using open operation
             morp_stream.write(morp_frame)
             hog_dat,hog_image = hog_extraction(morp_frame)
-            print hog_dat.shape
+            #print hog_dat.shape
             csv_writer.writerow(hog_dat)
+            #hog_bar(hog_dat)
+
+
 
             ##showing hog image session
             hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 0.02))

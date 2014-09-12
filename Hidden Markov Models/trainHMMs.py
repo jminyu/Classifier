@@ -132,7 +132,7 @@ def Baum_welch_test(initial, transition,observation,dat):
 
     for i in range(0,num_of_state):
         for j in range(0,num_of_state):
-            xi[num_of_state-1,i,j] = (forward_variable[i,num_of_state-2]*transition[i,j]*observation[j,dat[0,num_of_state-1]]*backward_variable[j,num_of_state-1])/temp_[num_of_state-2,0]
+            xi[num_of_state-1,i,j] = (forward_variable[i,num_of_stat e-2]*transition[i,j]*observation[j,dat[0,num_of_state-1]]*backward_variable[j,num_of_state-1])/temp_[num_of_state-2,0]
 
 
 
