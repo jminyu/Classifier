@@ -33,8 +33,39 @@ def hog_extraction(frame):
 
 
 
+def motion_trajectories_stack_feature_image(cap_stream,morp_stream):
+    kernel = np.ones((5,5),np.uint8) #kernal function for open operation
+    stack_feature = np.zeros((240,320),dtype=float);
+    frame_t1 = np.zeros((240,320),dtype=float)
+    start = 0;
+    if cap_stream.isOpened():
+        ret, frame = cap_stream.read()
+        morp_frame = cv2.morphologyEx(frame,cv2.MORPH_CLOSE,kernel) #remove outlier using open operation
+        morp_stream.write(morp_frame)
+        while(True):
+            frame_t1 = color.rgb2gray(morp_frame)
 
-def motion_trajectories_stack_feature(cap_stream,morp_stream):
+            if ret==True:
+                #if a pixel have a different value to previous frame then it occur
+                ret, frame = cap_stream.read()
+                if ret==True:
+                    morp_frame = cv2.morphologyEx(frame,cv2.MORPH_CLOSE,kernel) #remove outlier using open operation
+                    morp_stream.write(morp_frame)
+                    frame_t2 = color.rgb2gray(morp_frame)
+                    stack_feature = stack_feature + (frame_t2-frame_t1)*0.1
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
+
+            else:
+                break
+
+    return stack_feature
+
+
+
+def motion_trajectories_stack_feature_HOG(cap_stream,morp_stream):
     kernel = np.ones((5,5),np.uint8) #kernal function for open operation
     stack_feature = np.zeros((240,320),dtype=float);
     while(cap_stream.isOpened()):

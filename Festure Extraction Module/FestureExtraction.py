@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import cv2
 
 from removing_noise import MorpologyClose
-from removing_noise import motion_trajectories_stack_feature, d3_plotting
+from removing_noise import motion_trajectories_stack_feature_HOG, d3_plotting, motion_trajectories_stack_feature_image
 
 from skimage.feature import hog
 from skimage import data, color, exposure
@@ -33,8 +33,9 @@ processed_video = cv2.VideoWriter('F:/Dataset/hand gesture/subject1_dep/Result/K
 
 #MorpologyClose(cap_video,processed_video,'F:/Dataset/hand gesture/subject1_dep/Result/hog.csv')
 print 'starting extraction of stack feature'
-stack_feature = motion_trajectories_stack_feature(cap_video,processed_video)
+#stack_feature_HOG = motion_trajectories_stack_feature_HOG(cap_video,processed_video)
+stack_feature_image = motion_trajectories_stack_feature_image(cap_video,processed_video)
 print 'stacking is fin'
-d3_plotting(stack_feature)
+d3_plotting(stack_feature_image)
 
 
